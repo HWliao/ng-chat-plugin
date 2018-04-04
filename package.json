@@ -1,6 +1,6 @@
 {
-  "name": "my-project",
-  "version": "0.0.0",
+  "name": "ng-chat-plugin",
+  "version": "1.0.0",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -10,6 +10,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
+  "description": "angular store chat plugin",
   "private": true,
   "dependencies": {
     "@angular/animations": "^5.2.0",
