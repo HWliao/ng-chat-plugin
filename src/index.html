@@ -10,5 +10,293 @@
 </head>
 <body>
   <app-root></app-root>
+  <div class="container">
+    <div>
+      <h4>脚本引入</h4>
+      <pre>
+      // css
+      &lt;link rel=&quot;stylesheet&quot; href=&quot;http(s)://cdn.com/path/to/static/css/main.css&quot;/&gt;
+      // js
+      &lt;script src=&quot;http(s)://cdn.com/path/to/static/js/vender.js&quot;/&gt;
+      &lt;script src=&quot;http(s)://cdn.com/path/to/static/js/main.js&quot;/&gt;
+    </pre>
+      <h4>常量</h4>
+      <pre>
+      // 基本常量
+      // 群
+      Im.constant.SCENE_TEAM = 'team';
+      // 单聊
+      Im.constant.SCENE_P2P = 'p2p';
+
+      // 事件名称
+      // 登入按钮点击事件
+      Im.event.IM_TO_LOGIN = 'im_to_login';
+      // 登入状态下 展开 事件
+      Im.event.IM_TO_UP = 'im_to_login';
+      // 收到消息 根据配置中msgFilter过滤后的消息
+      Im.event.IM_MSG = 'im_msg';
+      // 错误事件
+      Im.event.IM_ERROR = 'im_error';
+
+      // 错误代码
+      // 已经登入
+      Im.error.IS_LOGINED = 'isLogined',
+      // 未登入
+      Im.error.NOT_LOGIN = 'notLogin',
+    </pre>
+      <h4>基本功能</h4>
+      <p>
+      <pre class="pre-scrollable">
+        // 初始化
+        var im = new Im({
+          // 自定义,加在最外层div上的class
+          className: '',
+          // 开启debug日志
+          debug: true,
+          // 开启第三方debug日志,主要是云信sdk的日志
+          thirdPartyDebug: false,
+          // 对应云信的appkey
+          appKey: '638aae803525df4d733c7703e0c3323f',
+          // 追加到消息自定义字段中用来标示消息来源
+          fromClientType: 'WEB_IM_PLUGIN',
+          // 图片上传最大阈值
+          imageUploadMaxLimit: 1024 * 1024,
+          // emoji资源路径
+          emojiPath: `${process.env.PUBLIC_URL}emoji`,
+
+          // 用户信息获取接口
+          getUsers: (accids = [], cb) => {
+            setTimeout(() => {
+              cb(accids.map(accid => ({
+                accid,
+                nick: `nick${accid}`,
+                avatar: 'https://imgcloud.jjshome.com/pic/fang/2016-11/24/FrWAfxshNWeuW3k8QFBiWM6g8rTT.jpg?imageView2/1/w/66/h/88',
+              })));
+            }, 1000);
+          },
+          // 转换house url
+          convertHouseUrl: (content) => {
+            return content && content.data && content.data.url;
+          },
+          // 是否需要发送快捷键 ctrl+enter
+          needSendShortcut: false,
+          // 会话过滤 决定在会话列表显示哪些会话
+          // 只展示单聊,且不为某个accid
+          sessionFilter: (scene, to) => scene === Im.constant.SCENE_P2P && to !== 'service000001',
+          // 消息过滤 决定哪些消息从插件冒泡出来
+          // 只冒冒泡 与咨询相关 的消息
+          msgFilter: (custom, msg) => {
+            // 无人咨询
+            // {"data":{"errorCode":"404"},"type":"ConsultationFailed"}
+            if (custom && custom.type && custom.type === 'ConsultationFailed') {
+              return true;
+            }
+
+            // 咨询成功
+            // {
+            //  "type":"ConsultationSuccess",
+            //  "data":{
+            //    "status":4320561232,
+            //    "tips":"接入客户咨询",
+            //    "workId":"77834993",
+            //    "brokerName":"张敏",
+            //    "workNo":"073282",
+            //    "brokerPortrait":""
+            //  }
+            // }
+            if (custom && custom.type && custom.type === 'ConsultationSuccess') {
+              return true;
+            }
+            return false;
+          },
+          // 是否为在线客服
+          isOnlinCustomer: (scene, to) => {
+            // scene 场景 SCENE_P2P SCENE_TEAM
+            // to accid/tid 云信id(工号) 群id
+            // 返回true表示在线客服
+          },
+
+          // 以下为插件用到的文案
+          // 侧边栏提示
+          sidebarTitle: '在线咨询',
+          sidebarUpTip: '收起',
+          sidebarDownTip: '展开',
+          // 未登入页信息
+          nologinTitle: '请先登录后再咨询经纪人',
+          loginBtnTitle: '登录',
+          // 侧边栏列表 无
+          noagentTitle: '暂无聊过天的经纪人',
+          // 输入框placeholder
+          inputPlaceHolder: '输入您要咨询的内容',
+          // inputFooter title
+          inputFooterTitle: '下载房源网App',
+          // inputFooter text
+          inputFooterText: '下载房源网App，随时随地找房',
+          // inputFooter href
+          inputFooterHref: 'https://shenzhen.leyoujia.com/common/app/download',
+          // 消息列表头部title
+          chatContentHeader: '聊天中经纪人无法知道您的手机号',
+          // 在线客服的咨询时间段
+          onlineCustomerTimeTip: '咨询服务时间：09:00-18:00',
+        });
+      </pre>
+      <button id="init" class="btn btn-primary">初始化</button>
+      </p>
+      <p>
+      <pre>
+        // 显示
+        im.show(true);
+        // 隐藏
+        im.show(false);
+        // 登入状态
+        im.isLogin();
+        // 连接状态
+        im.isConnect();
+        // 显示状态
+        im.isShow();
+        // 展开/收起状态
+        im.isUp();
+        // 获取平台信息  静态函数
+        Im.getPlatform();
+      </pre>
+      <button id="hideLayout" class="btn btn-primary">隐藏/显示</button>
+      <button id="isLogin" class="btn btn-primary">登入状态</button>
+      <button id="isConnect" class="btn btn-primary">连接状态</button>
+      <button id="isShow" class="btn btn-primary">显示状态</button>
+      <button id="isUp" class="btn btn-primary">展开/收起状态</button>
+      <button id="getPlatform" class="btn btn-primary">获取环境信息(浏览器版本之类的)</button>
+      </p>
+      <p>
+      <pre>
+        // 登入
+        im.login('xxxx','xxxx');
+        // 登出
+        im.logout();
+      </pre>
+      <button id="login" class="btn btn-primary">登入</button>
+      <button id="logout" class="btn btn-default">登出</button>
+      </p>
+      <p>
+      <pre>
+        // 咨询中
+        im.gotoConsultative({
+          toUrl: 'https://www.baidu.com',
+          img: 'https://imgcloud.jjshome.com/pic/hsl/2017-09/19/929354be-3202-4b83-bd71-9755a82aa8fe.jpg?imageView2/2/w/160/h/120',
+          title: '旭飞花园 一房一厅一室一卫',
+          attr: '1室1厅1卫  108m²',
+          price: '155万',
+          tip: '正在为您安排置业顾问，请稍等...',
+        });
+        // 咨询--无人抢单
+        im.gotoConsultativeFail({
+          toUrl: 'https://www.baidu.com',
+          img: 'https://imgcloud.jjshome.com/pic/hsl/2017-09/19/929354be-3202-4b83-bd71-9755a82aa8fe.jpg?imageView2/2/w/160/h/120',
+          title: '旭飞花园 一房一厅一室一卫',
+          attr: '1室1厅1卫  108m²',
+          price: '155万',
+          tip: '置业顾问正忙，您可致电客服',
+        });
+      </pre>
+      <button id="consultative" class="btn btn-primary">咨询中</button>
+      <button id="consultativeFail" class="btn btn-default">咨询失败</button>
+      </p>
+      <p>
+      <pre>
+        // 发送文本消息
+        // 参数1: scene 场景  p2p/team
+        // 参数2: to    发给谁 accid/tid
+        // 参数3: text  文本内容 字符串类型
+        // 返回一个Promise对象
+        im.sendTextMessage(Im.constant.SCENE_P2P,'123106','text')
+        .then(function(msg){/* 成功回调 */})
+        .catch(function(error){/* 失败回调 */});
+      </pre>
+      <button id="sendTextMessage" class="btn btn-primary">发送文本消息</button>
+      </p>
+      <p>
+      <pre>
+        // 发送自定义消息
+        // 参数1: scene 场景  p2p/team
+        // 参数2: to    发给谁 accid/tid
+        // 参数3: content  自定义消息内容,有固定格式
+        // 参数4: pushContent 消息推送内容,每种自定消息不一样, 字符串类型
+        // 返回一个Promise对象
+        im.sendCustomMessage(
+          Im.constant.SCENE_P2P,
+          '123106',
+          {
+            "type":5,
+            "data":{
+              "houseId":"7984366",
+              "orientation":"西南",
+              "fitment":"简单装修",
+              "hall":"2",
+              "url":"https://wap.jjshome.com/wap/esf/detail/7984366","area":"80.68",
+              "addr":"淡水镇长安南路与熊猫大道交汇",
+              "title":"靓房诚心出售",
+              "price":"68",
+              "room":"2",
+              "houseType":"2",
+              "houseImage":"https://imgcloud.jjshome.com/pic/hsl/2017-03/04/ff029ae8-de83-4ded-bcb2-6468f25762be.jpg",
+              "forward":"西南",
+              "lpName":"惠阳左岸春天"
+            }
+          },'[房源]')
+        .then(function(msg){/* 成功回调 */})
+        .catch(function(error){/* 失败回调 */});
+      </pre>
+      <button id="sendCustomMessage" class="btn btn-primary">发送自定义消息</button>
+      </p>
+      <p>
+      <pre>
+        // 设置当前会话
+        // 参数1: scene 场景 p2p/team
+        // 参数2: to    聊天对象 accid/tid
+        // 参数3: toUp  是否展开 默认true
+        im.setCurrSession(Im.constant.SCENE_P2P,'123106');
+      </pre>
+      <button id="setCurrSession" class="btn btn-primary">设置当前会话</button>
+      </p>
+      <p>
+      <pre>
+        // 销毁
+        im.destroy();
+      </pre>
+      <button id="destroy" class="btn btn-primary">销毁</button>
+      </p>
+      <h4>事件</h4>
+      <pre>
+      // 登入事件
+      im.on(Im.event.IM_TO_LOGIN,() => {
+        // 没有参数
+      });
+      // 登入状态下展开
+      im.on(Im.event.IM_TO_UP,() => {
+        // 没有参数
+      });
+      // 登入状态下展开/收起
+      im.on(Im.event.IM_TO_TOGGLE,() => {
+        // 没有参数
+      });
+      // 新消息
+      im.on(Im.event.IM_MSG, (content,msg) => {
+        // content 自定义消息的内容体
+        // msg 完整消息
+        // 里面的字段,各种消息不一样
+      });
+      im.on(Im.event.IM_ERROR, (error) => {
+        // 错误对象
+        // 包含 code,message字段
+
+        // 可以根据 code进行错误判断
+        // 目前的code除了自己定义的  已经登入,未登入  两种之外还有一堆云信定义
+        // 其中比较特殊(需要关注)的是'kicked',被其他人踢掉
+
+        // message属性错误说明
+      });
+    </pre>
+    </div>
+  </div>
+  <textarea id="console" title="" style="position: fixed;right: 0;top: 0;width: 136px;height: 300px;"></textarea>
 </body>
 </html>
