@@ -1,15 +1,19 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { StoreService } from './store.service';
+import { StoreOptionsToken, StoreService } from './store.service';
 
 @NgModule({
   imports: [],
-  providers: [StoreService],
+  providers: [],
   declarations: []
 })
 export class StoreModule {
-  static forRoot(): ModuleWithProviders {
+  static forRoot(ops: any = { test: 1 }): ModuleWithProviders {
     return {
-      ngModule: StoreModule
+      ngModule: StoreModule,
+      providers: [
+        { provide: StoreOptionsToken, useValue: ops },
+        StoreService
+      ]
     };
   }
 }

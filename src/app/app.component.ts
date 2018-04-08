@@ -12,5 +12,6 @@ export class AppComponent {
 
   constructor(private config: ImApiConfigEntity, store: StoreService) {
     console.log(config);
+    window['store'] = store;
   }
 }
