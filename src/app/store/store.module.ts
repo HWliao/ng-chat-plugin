@@ -1,5 +1,6 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { StoreOptionsToken, StoreService } from './store.service';
+import { TestEntity } from './test.entity';
 
 @NgModule({
   imports: [],
@@ -12,7 +13,8 @@ export class StoreModule {
       ngModule: StoreModule,
       providers: [
         { provide: StoreOptionsToken, useValue: ops },
-        StoreService
+        StoreService,
+        TestEntity
       ]
     };
   }

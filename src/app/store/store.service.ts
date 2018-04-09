@@ -54,7 +54,8 @@ export class StoreService {
       extraReducers = {},
       initState = {},
       middleware = [],
-      extraEnhancers = []
+      extraEnhancers = [],
+      devtool = true
     } = storeOps;
     this._extraReducers = Object.assign({}, extraReducers);
     this._entityReducers = Object.assign({}, this.getReducer(entiy));
@@ -62,7 +63,7 @@ export class StoreService {
     const enhancers: StoreEnhancer<State>[] = [
       applyMiddleware(...middleware),
       ...extraEnhancers,
-      devtool(true)
+      openDevtool(devtool)
     ];
 
     this._store = createStore<State>(
@@ -112,7 +113,7 @@ function createReducer<S extends State = State>(reducers: ReducersMapObject, red
  * @param {boolean} open
  * @return {StoreEnhancer<S>}
  */
-function devtool<S extends State = State>(open: boolean): StoreEnhancer<S> {
+function openDevtool<S extends State = State>(open: boolean): StoreEnhancer<S> {
   if (open && window.__REDUX_DEVTOOLS_EXTENSION__) {
     return window.__REDUX_DEVTOOLS_EXTENSION__(window.__REDUX_DEVTOOLS_EXTENSION__OPTIONS);
   }
