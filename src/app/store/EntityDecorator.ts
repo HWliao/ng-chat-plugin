@@ -1,6 +1,6 @@
 import isEmpty from 'lodash-es/isEmpty';
 import { META_DESIGN_PARAMTYPES, META_STORE_NSFACTORY, reflect } from './util';
-import { Injector } from '@angular/core';
+import { StoreService } from './store.service';
 
 export interface Constructor extends Object {
   new(...args: any[]): any;
@@ -27,52 +27,66 @@ export function EntityDecoratorFactory(name) {
   }
   const nsFactory: NamespaceFactory = typeof name === 'function' ? () => name() : () => name;
   return function (EntityClass: Constructor) {
-    // 为entity定义namespace factory
+    // 为EntityClass定义namespace factory
     reflect.defineMetadata(META_STORE_NSFACTORY, nsFactory, EntityClass);
-    // todo 链接angular的依赖注入系统
+
     // EntityClass构造函数中不能有参数
-    // EntityClass要链接到angular di系统中,侵入过大
     // 这里主要实现对EntityClass实例的代理
     const entityClassDesignParamtypes = reflect.getMetadata(META_DESIGN_PARAMTYPES, EntityClass);
     if (!isEmpty(entityClassDesignParamtypes)) {
-      throw Error('');
+      throw Error('Entity 构造器不能有参数!当前实现在Entity中不支持依赖注入!');
     }
     // 这里加一个空的装饰器,用于typescript自动填充meta-data
-    // angular需要依赖meta-data来依赖注入
+    // angular需要依赖meta-data来依赖注入,也可以使用@Injectable()
     @Empty()
     class TheEntity extends EntityClass {
-      constructor(private injector: Injector) {
+      constructor(private store: StoreService) {
         super();
+        // 在EntityClass构造器执行后,对当前实例进行代理装饰
+        // field
+        // action
+        // select
       }
     }
 
-    window['EntityClass'] = EntityClass;
-    window['TheEntity'] = TheEntity;
-    // 这里需要动态配置angular di dependencies列表(构造函数的参数列表是动态的)
-    // TheEntity 由typescript自动生成的design:paramtypes 在angular di中无法解析
-    // angular中通过reflect.getOwnMetadata来获取dependencies
-
-    // design:paramtypes 需要处理成与TheEntity constructor 参数列表顺序一致
-    // StoreService 提取到第一位,其他与entityClassDesignParamtypes的顺序保持一致
-//    reflect.defineMetadata(META_DESIGN_PARAMTYPES, [...entityClassDesignParamtypes], TheEntity);
-//    const ngMetaParameters = EntityClass.hasOwnProperty(META_NG_PARAMETERS) && EntityClass[META_NG_PARAMETERS];
-//    console.log(ngMetaParameters);
-//    if (ngMetaParameters) {
-//      reflect.set(TheEntity, META_NG_PARAMETERS, ngMetaParameters);
-//    }
+    // todo 链接angular的依赖注入系统
+    // 需要手动模拟出angular对于构造器解析的所有逻辑,如果angular的逻辑修改了呢??
     return TheEntity;
   };
 }
 
-export function Field(): any {
-  return function FieldDecorator(target: any, propertyKey: string) {
+export type FieldDecorator = (...args: any[]) => any;
+export type FieldDecoratorFactory = () => FieldDecorator;
+
+export function FieldDecoratorFactory() {
+  return function (target, propertyKey) {
+    console.log('field', arguments);
   };
 }
 
-export function Action(): any {
-  return function ActionDecorator(target: any, propertyKey: string) {
+export const Field: FieldDecoratorFactory = FieldDecoratorFactory;
+
+export type ActionDecorator = (target: any, propertyKey: string) => any;
+export type ActionDecoratorFactory = () => ActionDecorator;
+
+export function ActionDecoratorFactory() {
+  return function (target, propertyKey) {
+    console.log('action', arguments);
   };
 }
+
+export const Action: ActionDecoratorFactory = ActionDecoratorFactory;
+
+export type SelectDecorator = (target: any, propertyKey: string) => any;
+export type SelectDecoratorFactory = () => SelectDecorator;
+
+export function SelectDecoratorFactory() {
+  return function (target, propertyKey) {
+    console.log('select', arguments);
+  };
+}
+
+export const Select: SelectDecoratorFactory = SelectDecoratorFactory;
 
 export function Empty(): any {
   return () => void 0;
