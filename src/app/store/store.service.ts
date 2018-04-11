@@ -1,4 +1,4 @@
-import { Inject, Injectable, InjectionToken } from '@angular/core';
+import {Inject, Injectable, InjectionToken} from '@angular/core';
 import {
   applyMiddleware,
   combineReducers,
@@ -10,7 +10,7 @@ import {
   StoreEnhancer
 } from 'redux';
 import produce from 'immer';
-import { Entity, EntityState, ReducerEnhancer, State, StoreOptions } from './types';
+import {Entity, EntityState, ReducerEnhancer, State, StoreOptions} from './types';
 
 /**
  * StoreOptions的注入令牌
@@ -23,7 +23,7 @@ export const StoreOptionsToken = new InjectionToken<StoreOptions>('store_ops');
  */
 export const entiy: Entity<{ count: number }> = {
   namespace: '@@store',
-  state: { count: 0 },
+  state: {count: 0},
   actionDraftMap: {
     UPDATE: (state: { count: number }) => state.count += 1
   }
@@ -67,14 +67,14 @@ export class StoreService {
     ];
 
     this._store = createStore<State>(
-      createReducer({ ...this._entityReducers, ...this._extraReducers }, reducerEnhancer),
+      createReducer({...this._entityReducers, ...this._extraReducers}, reducerEnhancer),
       initState,
       compose(...enhancers)
     );
   }
 
   getReducer(entity: Entity<EntityState>): ReducersMapObject {
-    const { namespace, state: entityState, actionDraftMap } = entity;
+    const {namespace, state: entityState, actionDraftMap} = entity;
     if (this._extraReducers[namespace]) {
       throw new Error(`namespace:${namespace} 在extraReducers中已经存在!`);
     }
@@ -94,7 +94,10 @@ export class StoreService {
       }
       return state;
     };
-    return { [entity.namespace]: reducer };
+    return {[entity.namespace]: reducer};
+  }
+
+  createEntity() {
   }
 }
 
@@ -121,7 +124,7 @@ function openDevtool<S extends State = State>(open: boolean): StoreEnhancer<S> {
 }
 
 function prefixNamepace(entity: Entity<EntityState>) {
-  const { namespace, actionDraftMap } = entity;
+  const {namespace, actionDraftMap} = entity;
   return Object.keys(actionDraftMap).reduce((curr, key) => {
     const type = `${namespace}${DELIMITER}${key}`;
     curr[type] = actionDraftMap[key];

@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
-import { ImApiConfigEntity } from './im-api/im-api-config.entity';
-import { StoreService } from './store/store.service';
-import { TestEntity } from './store/test.entity';
-import { AppModule } from './app.module';
+import {Component} from '@angular/core';
+import {ImApiConfigEntity} from './im-api/im-api-config.entity';
+import {StoreService} from './store/store.service';
+import {TestEntity} from './store/test.entity';
+import {AppModule} from './app.module';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +13,7 @@ export class AppComponent {
   title = 'app';
 
   constructor(private config: ImApiConfigEntity, store: StoreService, test: TestEntity) {
-    window['store'] = store;
-    window['test'] = test;
+    // console.log(test.test);
+    // test.test = 'setter test';
   }
 }

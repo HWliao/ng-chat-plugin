@@ -1,28 +1,32 @@
-import { StoreOptionsToken, StoreService } from './store.service';
-import { Action, Entity, Field, Select } from './EntityDecorator';
-import { Inject, Injectable, Optional } from '@angular/core';
-import { StoreOptions } from './types';
+import {Action, Entity, Select} from './EntityDecorator';
+import {Injectable} from '@angular/core';
 
-@Injectable()
-@Entity('xxx')
-export class TestEntity {
+class TestEntityPar {
+  private sub = '';
 
-  @Field()
-  private test = 'lhw';
-
-  @Field()
-  private get test1() {
-    return 'test1';
+  @Action()
+  subAction() {
+    console.log('subAction');
   }
 
+  @Select()
+  subSelect() {
+    console.log('subAction');
+  }
+}
+
+@Injectable()
+@Entity('ns')
+export class TestEntity extends TestEntityPar {
+
+  test = 'lhw';
+
   constructor() {
-//    console.log(store);
-//    console.log(reflect.getMetadataKeys(TestEntity));
-//    console.log(reflect.getMetadata('design:paramtypes', TestEntity));
+    super();
   }
 
   @Action()
-  hello(h1: string, @Field() h2: string, h3?: TestEntity): string {
+  hello(h1: string, h2: string, h3?: TestEntity): string {
     return '';
   }
 
